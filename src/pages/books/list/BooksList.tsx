@@ -16,7 +16,7 @@ const BooksList = () => {
     <Box mx="100px">
       <Box display="flex" justifyContent="space-between" mt="36px">
         <Typography fontSize="36px" fontWeight={700} color="#fefefe">
-          You’ve got{" "}
+          You’ve got
           <Typography
             component="span"
             fontSize="inherit"
@@ -24,7 +24,7 @@ const BooksList = () => {
             color="primary"
           >
             &nbsp;7 book
-          </Typography>{" "}
+          </Typography>
         </Typography>
         <Stack direction="row" alignItems="center" spacing="24px">
           <TextField

@@ -74,7 +74,7 @@ const SignIn = () => {
                     Button
                   </Button>
                   <Typography textAlign="center" mt="12px">
-                    Already signed up?{" "}
+                    Already signed up?
                     <Link to="/sign-up" style={{ textDecoration: "initial" }}>
                       <Typography component="span" color="primary">
                         Go to sign up.
