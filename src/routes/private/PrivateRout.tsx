@@ -6,7 +6,7 @@ import { ErrorBoundary } from "services/error";
 import Layout from "layout/Layout";
 import NotFound from "pages/404/NotFound";
 // Books
-import { BooksList } from "pages/books";
+import { BooksAddOrEditModal, BooksList } from "pages/books";
 
 const router = createBrowserRouter([
   {
@@ -14,8 +14,18 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/books",
+        path: "books",
         element: <BooksList />,
+        children: [
+          {
+            path: "add",
+            element: <BooksAddOrEditModal />,
+          },
+          {
+            path: "edit/:bookId",
+            element: <BooksAddOrEditModal />,
+          },
+        ],
       },
       {
         path: "*",

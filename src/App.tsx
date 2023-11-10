@@ -88,6 +88,7 @@ function App() {
                 background: "#fefefe",
                 boxShadow: "0px 4px 32px 0px rgba(51, 51, 51, 0.04)",
                 borderRadius: "12px",
+                overflow: "initial",
               },
             },
           },

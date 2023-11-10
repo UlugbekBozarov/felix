@@ -1,18 +1,17 @@
-import {
-  Box,
-  Button,
-  Card,
-  Chip,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { Add } from "assets/icons";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Box, Button, Grid, Stack, TextField, Typography } from "@mui/material";
+
+import { Add, Delete, Edit } from "assets/icons";
+
+import { StyledCard, StyledChip, StyledIconButton } from "./BooksList.style";
 
 const BooksList = () => {
-  const { palette } = useTheme();
+  const navigate = useNavigate();
+
+  const handleAdd = () => {
+    navigate("/books/add");
+  };
+
   return (
     <Box mx="100px">
       <Box display="flex" justifyContent="space-between" mt="36px">
@@ -40,6 +39,7 @@ const BooksList = () => {
           <Button
             variant="contained"
             startIcon={<Add />}
+            onClick={handleAdd}
             sx={{ width: "180px" }}
           >
             Create a book
@@ -55,7 +55,7 @@ const BooksList = () => {
         <Grid container spacing={2}>
           {[...Array.from({ length: 4 })].map((_, index) => (
             <Grid item xs={12} md={6} lg={4} key={index}>
-              <Card>
+              <StyledCard>
                 <Box p="32px">
                   <Typography variant="h6" fontWeight={600} mb="6px">
                     Raspberry Pi User Guide
@@ -69,22 +69,29 @@ const BooksList = () => {
                     <Typography fontSize="14px" fontWeight={500}>
                       Raspberry Pi User Guide
                     </Typography>
-                    <Chip
-                      label="221 pages"
-                      sx={{
-                        height: "20px",
-                        fontSize: "12px",
-                        background: "#EFE6FD",
-                        color: palette?.primary?.main,
-                      }}
-                    />
+                    <StyledChip label="221 pages" />
                   </Box>
                 </Box>
-              </Card>
+                <StyledIconButton
+                  color="error"
+                  variant="contained"
+                  sx={{ borderBottomLeftRadius: 0 }}
+                >
+                  <Delete />
+                </StyledIconButton>
+                <StyledIconButton
+                  color="primary"
+                  variant="contained"
+                  sx={{ top: "50px", borderTopLeftRadius: 0 }}
+                >
+                  <Edit />
+                </StyledIconButton>
+              </StyledCard>
             </Grid>
           ))}
         </Grid>
       </Box>
+      <Outlet />
     </Box>
   );
 };
