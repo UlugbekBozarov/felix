@@ -4,9 +4,24 @@ import { Box, CircularProgress } from "@mui/material";
 interface SpinnerProps {
   width?: string;
   height?: string;
+  size?: string | number | undefined;
+  color?:
+    | "error"
+    | "inherit"
+    | "success"
+    | "primary"
+    | "secondary"
+    | "info"
+    | "warning"
+    | undefined;
 }
 
-const Spinner: FC<SpinnerProps> = ({ width = "100%", height = "100%" }) => {
+const Spinner: FC<SpinnerProps> = ({
+  width = "100%",
+  height = "100%",
+  size,
+  color,
+}) => {
   return (
     <Box
       width={width}
@@ -15,7 +30,7 @@ const Spinner: FC<SpinnerProps> = ({ width = "100%", height = "100%" }) => {
       justifyContent="center"
       alignItems="center"
     >
-      <CircularProgress />
+      <CircularProgress size={size} color={color} />
     </Box>
   );
 };

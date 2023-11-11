@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Stack, Button, Typography, Divider, Card } from "@mui/material";
+import { get } from "lodash";
 
 import { ControlledInput } from "components/form";
 import { Facebook, Google } from "assets/icons";
+import { client } from "services/api";
 
 const SignUp = () => {
   const formStore = useForm();
@@ -11,7 +13,12 @@ const SignUp = () => {
   const { handleSubmit } = formStore;
 
   const submitHandler = handleSubmit((data) => {
-    console.log("Data: ", data);
+    client.post("signup", {
+      name: get(data, "name"),
+      email: get(data, "email"),
+      key: get(data, "username"),
+      secret: "2892678138d8d793a28fc49055095d8b",
+    });
   });
 
   return (
@@ -53,8 +60,8 @@ const SignUp = () => {
                     OR
                   </Divider>
                   <ControlledInput
-                    label="Your username"
-                    name="username"
+                    label="Your name"
+                    name="name"
                     placeholder="Enter your username"
                   />
                   <ControlledInput
@@ -63,14 +70,13 @@ const SignUp = () => {
                     placeholder="Enter your email"
                   />
                   <ControlledInput
-                    type="password"
-                    label="Password"
-                    name="password"
-                    placeholder="Enter your password"
+                    label="Your username"
+                    name="username"
+                    placeholder="Enter your username"
                   />
                 </Stack>
                 <Box>
-                  <Button fullWidth variant="contained">
+                  <Button fullWidth variant="contained" type="submit">
                     Button
                   </Button>
                   <Typography textAlign="center" mt="12px">

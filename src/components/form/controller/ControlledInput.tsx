@@ -11,6 +11,7 @@ import { TextField } from "@mui/material";
 import { get } from "lodash";
 
 import { Label } from "../components";
+import { CheckCircle, CloseCircle } from "assets/icons";
 
 interface ControlledInputProps {
   type?: "text" | "password" | "number" | undefined;
@@ -52,6 +53,7 @@ const ControlledInput: FC<ControlledInputProps> = ({
       render={({
         field: { ref, onChange, ...field },
         fieldState: { error },
+        formState: { isSubmitted },
       }) => (
         <div>
           <Label
@@ -69,7 +71,13 @@ const ControlledInput: FC<ControlledInputProps> = ({
             {...field}
             InputProps={{
               startAdornment: startAdornment,
-              endAdornment: endAdornment,
+              endAdornment: !!error ? (
+                <CloseCircle color="#FF4D4F" />
+              ) : isSubmitted ? (
+                <CheckCircle />
+              ) : (
+                endAdornment
+              ),
             }}
             inputRef={ref}
             error={!!error}

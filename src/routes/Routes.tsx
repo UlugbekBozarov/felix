@@ -5,7 +5,7 @@ import PrivateRouts from "./private/PrivateRout";
 import PublicRouts from "./public/PublicRoute";
 
 const Routes = () => {
-  if (!getItemCookie(STORAGE_NAMES.authorization)) {
+  if (getItemCookie(STORAGE_NAMES.authorization)) {
     return <PrivateRouts />;
   } else {
     return <PublicRouts />;

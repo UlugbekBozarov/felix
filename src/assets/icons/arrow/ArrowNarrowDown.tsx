@@ -12,7 +12,7 @@ const ArrowNarrowDown = ({ width = "16", height = "16" }) => {
       <path
         d="M8 2.66666V13.3333M8 13.3333L12 9.33333M8 13.3333L4 9.33333"
         stroke="#151515"
-        stroke-width="1.6"
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

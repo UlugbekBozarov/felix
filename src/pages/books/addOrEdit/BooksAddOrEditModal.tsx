@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import {
   Box,
   Button,
@@ -9,9 +10,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { toast } from "react-hot-toast";
+import { get } from "lodash";
+import axios from "axios";
 
 import { CalendarDate, CloseCircle, Link } from "assets/icons";
 import { ControlledInput } from "components/form";
+import { Alert, Spinner } from "components/common";
 
 const style = {
   position: "absolute" as "absolute",
@@ -22,8 +27,48 @@ const style = {
   maxWidth: "430px",
 };
 
+interface BookResponseType {
+  id?: string | undefined;
+  title?: string | undefined;
+  author?: string | undefined;
+  cover?: string | undefined;
+  published?: number | undefined;
+  pages?: number | undefined;
+}
+
 const BooksAddOrEditModal = () => {
   const navigate = useNavigate();
+  const { bookId } = useParams();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async ({
+      id,
+      title,
+      author,
+      cover,
+      published,
+      pages,
+    }: BookResponseType) => {
+      return axios.post("https://0001.uz/books", {
+        id,
+        title,
+        author,
+        cover,
+        published,
+        pages,
+      });
+    },
+    onError: (error) => {
+      toast.custom((t) => (
+        <Alert
+          t={t}
+          type="error"
+          title={String(get(error, "code"))}
+          description={error?.message}
+        />
+      ));
+    },
+  });
 
   const formStore = useForm();
 
@@ -34,14 +79,21 @@ const BooksAddOrEditModal = () => {
   };
 
   const submitHandler = handleSubmit((data) => {
-    console.log("Data: ", data);
+    mutate({
+      id: bookId,
+      title: get(data, "title"),
+      author: get(data, "author"),
+      cover: get(data, "cover"),
+      published: get(data, "published") ? +get(data, "published") : undefined,
+      pages: get(data, "pages") ? +get(data, "pages") : undefined,
+    });
   });
 
   return (
-    <form onSubmit={submitHandler}>
-      <FormProvider {...formStore}>
-        <Modal open onClose={handleClose}>
-          <Box sx={style}>
+    <Modal open onClose={handleClose}>
+      <Box sx={style}>
+        <FormProvider {...formStore}>
+          <form onSubmit={submitHandler}>
             <Card>
               <Box p="24px 28px">
                 <Box
@@ -61,6 +113,7 @@ const BooksAddOrEditModal = () => {
                   <ControlledInput
                     label="Title"
                     name="title"
+                    rules={{ required: true }}
                     placeholder="Enter your title"
                   />
                   <ControlledInput
@@ -88,19 +141,35 @@ const BooksAddOrEditModal = () => {
                   />
                 </Stack>
                 <Stack direction="row" spacing="12px">
-                  <Button fullWidth variant="outlined" onClick={handleClose}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={handleClose}
+                    disabled={isPending}
+                  >
                     Close
                   </Button>
-                  <Button fullWidth variant="contained">
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    onClick={() => {
+                      console.log("Hello");
+                    }}
+                    disabled={isPending}
+                    startIcon={
+                      isPending && <Spinner color="inherit" size={16} />
+                    }
+                  >
                     Submit
                   </Button>
                 </Stack>
               </Box>
             </Card>
-          </Box>
-        </Modal>
-      </FormProvider>
-    </form>
+          </form>
+        </FormProvider>
+      </Box>
+    </Modal>
   );
 };
 
