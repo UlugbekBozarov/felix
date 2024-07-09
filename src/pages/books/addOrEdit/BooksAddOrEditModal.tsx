@@ -28,6 +28,11 @@ const style = {
 
 const formNames = {
   isbn: "isbn",
+  // title: "title",
+  // author: "author",
+  // cover: "cover",
+  // pages: "pages",
+  // published: "published",
 };
 
 const BooksAddOrEditModal = () => {
@@ -49,6 +54,11 @@ const BooksAddOrEditModal = () => {
   const submitHandler = handleSubmit((data) => {
     mutateAsync({
       [formNames.isbn]: get(data, formNames.isbn),
+      // [formNames.title]: get(data, formNames.title),
+      // [formNames.author]: get(data, formNames.author),
+      // [formNames.cover]: get(data, formNames.cover),
+      // [formNames.pages]: get(data, formNames.pages),
+      // [formNames.published]: get(data, formNames.cover),
     })
       .then((response) => {
         if (get(response, "isOk", false)) {
@@ -106,6 +116,31 @@ const BooksAddOrEditModal = () => {
                     }}
                     placeholder="-------------"
                   />
+                  {/* <ControlledInput
+                    label="Title"
+                    name={formNames.title}
+                    placeholder="Enter title"
+                  />
+                  <ControlledInput
+                    label="Author"
+                    name={formNames.author}
+                    placeholder="Enter author"
+                  />
+                  <ControlledInput
+                    label="Cover"
+                    name={formNames.cover}
+                    placeholder="Enter cover"
+                  />
+                  <ControlledInput
+                    label="Pages"
+                    name={formNames.pages}
+                    placeholder="Enter pages"
+                  />
+                  <ControlledInput
+                    label="Published"
+                    name={formNames.published}
+                    placeholder="Enter published"
+                  /> */}
                 </Stack>
                 <Stack direction="row" spacing="12px">
                   <Button
