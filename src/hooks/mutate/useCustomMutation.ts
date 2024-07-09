@@ -1,10 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { AxiosResponse, CancelToken } from "axios";
+import CryptoJS from "crypto-js";
+import { get } from "lodash";
 
-import { client } from "services/api";
+import { getAuthorizationKey, getAuthorizationSecret } from "services/storage";
 
 interface CustomMutationProps {
-  url: string;
+  path: string;
   method?: "GET" | "POST" | "PUT" | "DELETE";
   onError?:
     | ((
@@ -25,23 +27,42 @@ interface CustomMutationProps {
 interface MutationFuncVariabls {
   data?: object;
   params?: object;
+  headers?: HeadersInit | undefined;
   cancelToken?: CancelToken | undefined;
 }
 
 const useCustomMutation = ({
-  url,
+  path,
   method = "POST",
   onError,
   onSuccess,
 }: CustomMutationProps) => {
   const mutation = useMutation({
     mutationFn: async (data: MutationFuncVariabls | undefined = {}) => {
-      const response = await client({
-        url,
+      const authorizationKey = getAuthorizationKey();
+      const authorizationSecret = getAuthorizationSecret();
+
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}${path}`, {
         method,
-        ...data,
+        body: get(data, "data") ? JSON.stringify(get(data, "data")) : undefined,
+        mode: "cors",
+        headers: {
+          ...(authorizationKey
+            ? {
+                Key: authorizationKey,
+              }
+            : {}),
+          ...(authorizationSecret
+            ? {
+                Sign: CryptoJS.MD5(
+                  `${method}/${path}${authorizationSecret}`
+                ).toString(),
+              }
+            : {}),
+          ...(get(data, "headers", {}) || {}),
+        },
       });
-      return response;
+      return response.json();
     },
     onError,
     onSuccess,

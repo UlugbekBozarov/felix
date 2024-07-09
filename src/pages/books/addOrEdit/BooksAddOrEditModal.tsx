@@ -33,25 +33,9 @@ const formNames = {
 const BooksAddOrEditModal = () => {
   const navigate = useNavigate();
 
-  const {
-    // mutateAsync,
-    isPending,
-  } = useCustomMutation({
-    url: "books",
+  const { mutateAsync, isPending } = useCustomMutation({
+    path: "books",
     method: "POST",
-    onSuccess: () => {
-      navigate(-1);
-    },
-    onError: (error) => {
-      toast.custom((t) => (
-        <Alert
-          t={t}
-          type="error"
-          title={String(get(error, "code"))}
-          description={error?.message}
-        />
-      ));
-    },
   });
 
   const formStore = useForm();
@@ -63,14 +47,25 @@ const BooksAddOrEditModal = () => {
   };
 
   const submitHandler = handleSubmit((data) => {
-    // mutateAsync({
-    //   [formNames.isbn]: get(data, formNames.isbn),
-    // });
-    toast.custom((t) => (
-      <Alert t={t} title="Lorem ipsum">
-        Apini ishlatib bo'lmadi shuning uchun oddiygina message chiqaryabman
-      </Alert>
-    ));
+    mutateAsync({
+      [formNames.isbn]: get(data, formNames.isbn),
+    })
+      .then((response) => {
+        if (get(response, "isOk", false)) {
+          handleClose();
+        } else {
+          toast.custom((t) => (
+            <Alert
+              t={t}
+              type="error"
+              description={String(get(response, "message"))}
+            />
+          ));
+        }
+      })
+      .catch((error) => {
+        console.log("Error: ", error);
+      });
   });
 
   return (

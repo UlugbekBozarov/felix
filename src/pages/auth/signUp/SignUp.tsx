@@ -1,10 +1,20 @@
 import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Stack, Button, Typography, Card } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Button,
+  Typography,
+  Card,
+  CircularProgress,
+} from "@mui/material";
+import toast from "react-hot-toast";
 import { get } from "lodash";
 
 import { ControlledInput } from "components/form";
-import { setAuthorizationKey, setAuthorizationSign } from "services/storage";
+import { setAuthorizationKey, setAuthorizationSecret } from "services/storage";
+import { useCustomMutation } from "hooks";
+import { Alert } from "components/common";
 
 const formNames = {
   username: "username",
@@ -17,13 +27,42 @@ const SignUp = () => {
 
   const { handleSubmit, setError } = formStore;
 
-  const submitHandler = handleSubmit((data) => {
+  const { mutateAsync, isPending } = useCustomMutation({
+    path: "signup",
+    method: "POST",
+  });
+
+  const submitHandler = handleSubmit(async (data) => {
     if (
       get(data, formNames.password) === get(data, formNames.confirmPassword)
     ) {
-      setAuthorizationKey("Mason19");
-      setAuthorizationSign("MySecret19");
-      window.location.href = "/";
+      mutateAsync({
+        data: {
+          name: get(data, formNames.username),
+          key: get(data, formNames.username),
+          secret: get(data, formNames.password),
+        },
+      })
+        .then((response) => {
+          if (get(response, "isOk", false)) {
+            setAuthorizationKey(get(response, "data.key"));
+            setAuthorizationSecret(get(response, "data.secret"));
+            window.location.href = "/";
+          } else {
+            toast.custom((t) => (
+              <Alert
+                t={t}
+                type="error"
+                description={String(get(response, "message"))}
+              />
+            ));
+          }
+        })
+        .catch((error) => {
+          toast.custom((t) => (
+            <Alert t={t} type="error" description={String(error)} />
+          ));
+        });
     } else {
       setError(formNames.confirmPassword, {
         type: "manual",
@@ -83,7 +122,17 @@ const SignUp = () => {
                   />
                 </Stack>
                 <Box>
-                  <Button fullWidth variant="contained" type="submit">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    disabled={isPending}
+                    startIcon={
+                      isPending && (
+                        <CircularProgress size="16px" color="inherit" />
+                      )
+                    }
+                  >
                     Submit
                   </Button>
                   <Typography textAlign="center" mt="12px">

@@ -1,12 +1,7 @@
 import axios from "axios";
 import { get } from "lodash";
 
-import {
-  clearCookie,
-  getAuthorizationKey,
-  getAuthorizationSign,
-  getLanguage,
-} from "services/storage";
+import { clearCookie, getLanguage } from "services/storage";
 
 const client = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
@@ -15,13 +10,12 @@ const client = axios.create({
     "Content-Type": "application/json",
     "Accept-Language": getLanguage(),
     "Utc-Offset": new Date().getTimezoneOffset(),
-    Key: getAuthorizationKey(),
-    Sign: getAuthorizationSign(),
   },
 });
 
 client.interceptors.request.use(
-  (config) => {
+  (config: any) => {
+    config.mode = "cors";
     return config;
   },
   (error) => {

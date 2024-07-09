@@ -1,15 +1,34 @@
-import { FC } from "react";
-import { Box, Card, Chip, Typography } from "@mui/material";
+import { Dispatch, FC, SetStateAction } from "react";
+import { Box, Card, Chip, CircularProgress, Typography } from "@mui/material";
 import toast from "react-hot-toast";
 import { get } from "lodash";
 
 import { Delete, Edit } from "assets/icons";
-
-import { BooksType } from "../BooksList";
-import { StyledBox, StyledIconButton } from "./BookCard.style";
 import { Alert } from "components/common";
+import { useCustomMutation } from "hooks";
 
-const BookCard: FC<BooksType> = ({ book, status }) => {
+import { StyledBox, StyledIconButton } from "./BookCard.style";
+
+type BookCardProps = {
+  book: {
+    id: number;
+    isbn: string;
+    title: string;
+    cover?: string | undefined;
+    author?: string | undefined;
+    published?: number | undefined;
+    pages?: number | undefined;
+  };
+  status: number;
+  setReRender: Dispatch<SetStateAction<boolean>>;
+};
+
+const BookCard: FC<BookCardProps> = ({ book, status, setReRender }) => {
+  const { mutateAsync, isPending } = useCustomMutation({
+    path: `books/${get(book, "id")}`,
+    method: "DELETE",
+  });
+
   const handleEdit = () => {
     toast.custom((t) => (
       <Alert t={t} title="Lorem ipsum">
@@ -19,11 +38,28 @@ const BookCard: FC<BooksType> = ({ book, status }) => {
   };
 
   const handleDelete = () => {
-    toast.custom((t) => (
-      <Alert t={t} type="error" title="Lorem ipsum">
-        Apini ishlatib bo'lmadi shuning uchun oddiygina message chiqaryabman
-      </Alert>
-    ));
+    mutateAsync({})
+      .then((response) => {
+        if (get(response, "isOk", false)) {
+          toast.custom((t) => (
+            <Alert t={t} description={String(get(response, "message"))} />
+          ));
+          setReRender((prev: boolean) => !prev);
+        } else {
+          toast.custom((t) => (
+            <Alert
+              t={t}
+              type="error"
+              description={String(get(response, "message"))}
+            />
+          ));
+        }
+      })
+      .catch((error) => {
+        toast.custom((t) => (
+          <Alert t={t} type="error" description={String(error)} />
+        ));
+      });
   };
 
   return (
@@ -52,7 +88,9 @@ const BookCard: FC<BooksType> = ({ book, status }) => {
           <Box display="flex" justifyContent="space-between">
             <Typography fontSize="14px" fontWeight={500}>
               {book?.author}&nbsp;/&nbsp;
-              {`${new Date(book?.published || "").getFullYear()}-year`}
+              {book?.published
+                ? new Date(book?.published || "").getFullYear()
+                : "-"}
             </Typography>
             <Chip
               color={
@@ -69,12 +107,13 @@ const BookCard: FC<BooksType> = ({ book, status }) => {
         color="error"
         variant="contained"
         onClick={handleDelete}
+        disabled={isPending}
         sx={{
           borderBottomRightRadius: { xs: 0, lg: "4px" },
           borderBottomLeftRadius: { lg: 0 },
         }}
       >
-        <Delete />
+        {isPending ? <CircularProgress /> : <Delete />}
       </StyledIconButton>
       <StyledIconButton
         color="primary"

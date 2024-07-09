@@ -6,8 +6,8 @@ export { default as setItemCookie } from "./cookies/setItemCookie";
 // Custom
 export {
   getAuthorizationKey,
-  getAuthorizationSign,
+  getAuthorizationSecret,
   setAuthorizationKey,
-  setAuthorizationSign,
+  setAuthorizationSecret,
   getLanguage,
 } from "./custom";

@@ -16,7 +16,7 @@ const NotFound = () => {
   return (
     <Box
       width="100%"
-      height="100vh"
+      minHeight="calc(100vh - 72px)"
       display="flex"
       justifyContent="center"
       alignItems="center"

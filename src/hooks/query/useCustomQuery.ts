@@ -1,53 +1,72 @@
 import { useQuery } from "@tanstack/react-query";
-import { CancelToken } from "axios";
+import CryptoJS from "crypto-js";
+import { get } from "lodash";
 
-import { client } from "services/api";
+import { getAuthorizationKey, getAuthorizationSecret } from "services/storage";
+
+type Params = {
+  [key: string]: string;
+};
 
 interface CustomQueryProps {
-  url: string;
+  path: string;
   method?: "GET" | "POST" | "PUT" | "DELETE";
   queryKey?: any;
   staleTime?: number | undefined;
   enabled?: boolean | undefined;
   data?: object;
-  params?: object;
-  headers?: object;
-  cancelToken?: CancelToken | undefined;
+  params?: Params;
+  headers?: HeadersInit | undefined;
   onSuccess?: (data: any) => void;
 }
 
 const useCustomQuery = ({
-  url,
+  path,
   method = "GET",
   data,
-  params,
+  params = {},
   queryKey,
-  cancelToken,
   onSuccess,
   enabled,
   headers,
 }: CustomQueryProps) => {
   const query = useQuery({
-    queryKey: [url, queryKey],
+    queryKey: [path, queryKey],
     enabled,
     queryFn: async () => {
-      const response = await client({
-        url,
-        data,
+      const url = new URL(`${process.env.REACT_APP_BASE_URL}${path}`);
+
+      Object.keys(params).forEach((key) =>
+        url.searchParams.append(key, params[key])
+      );
+
+      const response = await fetch(url, {
         method,
-        params,
-        cancelToken,
-        headers,
-      })
-        .then((response) => {
-          if (onSuccess) {
-            onSuccess(response);
-          }
-          return response;
-        })
-        .catch((error) => {
-          throw new Error("Fetch not successful", error);
-        });
+        body: get(data, "data") ? JSON.stringify(get(data, "data")) : undefined,
+        mode: "cors",
+        headers: {
+          ...(headers || {}),
+          Key: getAuthorizationKey(),
+          Sign: CryptoJS.MD5(
+            `${method}/${path}${
+              get(data, "data") || ""
+            }${getAuthorizationSecret()}`
+          ).toString(),
+        },
+      }).then((response) => {
+        return response.json();
+      });
+      // const response = await client({
+      //   url,
+      //   data,
+      //   method,
+      //   params,
+      //   cancelToken,
+      //   headers,
+      // })
+      // .catch((error) => {
+      //   throw new Error("Fetch not successful", error);
+      // });
       return response;
     },
   });

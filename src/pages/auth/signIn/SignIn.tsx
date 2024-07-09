@@ -1,10 +1,21 @@
 import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Stack, Button, Typography, Card, Alert } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Button,
+  Typography,
+  Card,
+  CircularProgress,
+} from "@mui/material";
+import toast from "react-hot-toast";
+import CryptoJS from "crypto-js";
+import { get } from "lodash";
 
 import { ControlledInput } from "components/form";
-import { get } from "lodash";
-import { setAuthorizationKey, setAuthorizationSign } from "services/storage";
+import { setAuthorizationKey, setAuthorizationSecret } from "services/storage";
+import { useCustomMutation } from "hooks";
+import { Alert } from "components/common";
 
 const formNames = {
   username: "username",
@@ -14,26 +25,42 @@ const formNames = {
 const SignIn = () => {
   const formStore = useForm();
 
-  const { handleSubmit, setError } = formStore;
+  const { handleSubmit } = formStore;
+
+  const { mutateAsync, isPending } = useCustomMutation({
+    path: "myself",
+    method: "GET",
+  });
 
   const submitHandler = handleSubmit((data) => {
-    if (
-      get(data, formNames.username) === "demo" &&
-      get(data, formNames.password) === "123456"
-    ) {
-      setAuthorizationKey("Mason19");
-      setAuthorizationSign("MySecret19");
-      window.location.href = "/";
-    } else {
-      setError(formNames.username, {
-        type: "manual",
-        message: "Username or password is incorrect",
+    mutateAsync({
+      headers: {
+        Key: get(data, formNames.username),
+        Sign: CryptoJS.MD5(
+          `GET/myself${get(data, formNames.password)}`
+        ).toString(),
+      },
+    })
+      .then((response) => {
+        if (get(response, "isOk", false)) {
+          setAuthorizationKey(get(response, "data.key"));
+          setAuthorizationSecret(get(response, "data.secret"));
+          window.location.href = "/";
+        } else {
+          toast.custom((t) => (
+            <Alert
+              t={t}
+              type="error"
+              description={String(get(response, "message"))}
+            />
+          ));
+        }
+      })
+      .catch((error) => {
+        toast.custom((t) => (
+          <Alert t={t} type="error" description={String(error)} />
+        ));
       });
-      setError(formNames.password, {
-        type: "manual",
-        message: "Username or password is incorrect",
-      });
-    }
   });
 
   return (
@@ -52,11 +79,6 @@ const SignIn = () => {
                 <Typography variant="h4" textAlign="center" fontWeight={600}>
                   Sign In
                 </Typography>
-                <Box>
-                  <Alert severity="info">
-                    Use username: 'demo' with password: '123456'
-                  </Alert>
-                </Box>
                 <Stack spacing={2} my="36px">
                   <ControlledInput
                     label="Username"
@@ -81,7 +103,17 @@ const SignIn = () => {
                   />
                 </Stack>
                 <Box>
-                  <Button fullWidth type="submit" variant="contained">
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    disabled={isPending}
+                    startIcon={
+                      isPending && (
+                        <CircularProgress size="16px" color="inherit" />
+                      )
+                    }
+                  >
                     Button
                   </Button>
                   <Typography textAlign="center" fontWeight="300" mt="12px">

@@ -1,10 +1,10 @@
-import { getAuthorizationKey, getAuthorizationSign } from "services/storage";
+import { getAuthorizationKey, getAuthorizationSecret } from "services/storage";
 
 import PrivateRouts from "./private/PrivateRout";
 import PublicRouts from "./public/PublicRoute";
 
 const Routes = () => {
-  if (getAuthorizationKey() && getAuthorizationSign()) {
+  if (getAuthorizationKey() && getAuthorizationSecret()) {
     return <PrivateRouts />;
   } else {
     return <PublicRouts />;
