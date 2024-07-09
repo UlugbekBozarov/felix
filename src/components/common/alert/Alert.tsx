@@ -1,13 +1,8 @@
 import { FC, ReactNode, useMemo } from "react";
-import { AlertTitle, IconButton, Alert as MuiAlert } from "@mui/material";
-import { toast, Toast } from "react-hot-toast";
+import { AlertTitle, Alert as MuiAlert, Typography } from "@mui/material";
+import { Toast } from "react-hot-toast";
 
-import {
-  CheckCircleBroken,
-  Close,
-  CloseCircle,
-  WarningCircle,
-} from "assets/icons";
+import { CheckCircleBroken, CloseCircle, WarningCircle } from "assets/icons";
 
 interface AlertProps {
   title?: string | undefined;
@@ -17,8 +12,13 @@ interface AlertProps {
   children?: ReactNode;
 }
 
-const Alert: FC<AlertProps> = ({ title, type, description, t, children }) => {
-  console.log("Toast: ", t);
+const Alert: FC<AlertProps> = ({
+  title,
+  type = "success",
+  description,
+  t,
+  children,
+}) => {
   const icon = useMemo(() => {
     switch (type) {
       case "warning": {
@@ -36,22 +36,16 @@ const Alert: FC<AlertProps> = ({ title, type, description, t, children }) => {
     <MuiAlert
       icon={icon}
       variant="filled"
-      action={
-        <IconButton
-          aria-label="close"
-          color="inherit"
-          size="small"
-          onClick={() => toast.dismiss(t?.id)}
-        >
-          <Close />
-        </IconButton>
-      }
       className={t?.visible ? "animate-enter" : "animate-leave"}
       severity={type}
-      color="error"
+      color={type}
     >
-      <AlertTitle>{title}</AlertTitle>
-      {children || description}
+      <AlertTitle color={`${type}.contrastText`} sx={{ marginBottom: "4px" }}>
+        {title}
+      </AlertTitle>
+      <Typography variant="caption" color={`${type}.contrastText`}>
+        {children || description}
+      </Typography>
     </MuiAlert>
   );
 };

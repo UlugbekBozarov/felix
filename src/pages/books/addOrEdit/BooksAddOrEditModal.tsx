@@ -1,6 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import {
   Box,
   Button,
@@ -12,11 +11,11 @@ import {
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 import { get } from "lodash";
-import axios from "axios";
 
-import { CalendarDate, CloseCircle, Link } from "assets/icons";
+import { CloseCircle, Link } from "assets/icons";
 import { ControlledInput } from "components/form";
 import { Alert, Spinner } from "components/common";
+import { useCustomMutation } from "hooks";
 
 const style = {
   position: "absolute" as "absolute",
@@ -27,36 +26,21 @@ const style = {
   maxWidth: "430px",
 };
 
-interface BookResponseType {
-  id?: string | undefined;
-  title?: string | undefined;
-  author?: string | undefined;
-  cover?: string | undefined;
-  published?: number | undefined;
-  pages?: number | undefined;
-}
+const formNames = {
+  isbn: "isbn",
+};
 
 const BooksAddOrEditModal = () => {
   const navigate = useNavigate();
-  const { bookId } = useParams();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async ({
-      id,
-      title,
-      author,
-      cover,
-      published,
-      pages,
-    }: BookResponseType) => {
-      return axios.post("https://0001.uz/books", {
-        id,
-        title,
-        author,
-        cover,
-        published,
-        pages,
-      });
+  const {
+    // mutateAsync,
+    isPending,
+  } = useCustomMutation({
+    url: "books",
+    method: "POST",
+    onSuccess: () => {
+      navigate(-1);
     },
     onError: (error) => {
       toast.custom((t) => (
@@ -79,14 +63,14 @@ const BooksAddOrEditModal = () => {
   };
 
   const submitHandler = handleSubmit((data) => {
-    mutate({
-      id: bookId,
-      title: get(data, "title"),
-      author: get(data, "author"),
-      cover: get(data, "cover"),
-      published: get(data, "published") ? +get(data, "published") : undefined,
-      pages: get(data, "pages") ? +get(data, "pages") : undefined,
-    });
+    // mutateAsync({
+    //   [formNames.isbn]: get(data, formNames.isbn),
+    // });
+    toast.custom((t) => (
+      <Alert t={t} title="Lorem ipsum">
+        Apini ishlatib bo'lmadi shuning uchun oddiygina message chiqaryabman
+      </Alert>
+    ));
   });
 
   return (
@@ -111,33 +95,21 @@ const BooksAddOrEditModal = () => {
                 </Box>
                 <Stack spacing="16px" mb="28px">
                   <ControlledInput
-                    label="Title"
-                    name="title"
-                    rules={{ required: true }}
-                    placeholder="Enter your title"
-                  />
-                  <ControlledInput
-                    label="Author"
-                    name="author"
-                    placeholder="Enter your author"
-                  />
-                  <ControlledInput
-                    label="Cover"
-                    name="cover"
+                    label="Isbn"
+                    name={formNames.isbn}
                     startAdornment={<Link />}
-                    placeholder="Enter your cover"
-                  />
-                  <ControlledInput
-                    label="Published"
-                    name="published"
-                    startAdornment={<CalendarDate />}
-                    placeholder="Enter your published"
-                  />
-                  <ControlledInput
-                    label="Pages"
-                    name="pages"
-                    startAdornment={<CalendarDate />}
-                    placeholder="Enter your pages"
+                    rules={{
+                      required: true,
+                      minLength: {
+                        value: 13,
+                        message: "Must be 13 characters long",
+                      },
+                      maxLength: {
+                        value: 13,
+                        message: "Must be 13 characters long",
+                      },
+                    }}
+                    placeholder="-------------"
                   />
                 </Stack>
                 <Stack direction="row" spacing="12px">

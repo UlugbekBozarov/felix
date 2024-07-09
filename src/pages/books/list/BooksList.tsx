@@ -1,85 +1,100 @@
-import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import {
   Box,
   Button,
+  Card,
+  Container,
   Grid,
   Skeleton,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { get } from "lodash";
-import axios from "axios";
-import { toast } from "react-hot-toast";
 
-import { Add, Delete, Edit } from "assets/icons";
-import { Alert } from "components/common";
+import { Add } from "assets/icons";
+// import { useCustomQuery } from "hooks";
 
-import { StyledCard, StyledChip, StyledIconButton } from "./BooksList.style";
+import BookCard from "./card/BookCard";
+import { useEffect, useState } from "react";
 
-type BooksType = {
-  id: number;
-  isbn: string;
-  title: string;
-  cover?: string | undefined;
-  author?: string | undefined;
-  published?: number | undefined;
-  pages?: number | undefined;
+export type BooksType = {
+  book: {
+    id: number;
+    isbn: string;
+    title: string;
+    cover?: string | undefined;
+    author?: string | undefined;
+    published?: number | undefined;
+    pages?: number | undefined;
+  };
+  status: number;
 };
+
+const staticBooks = [
+  {
+    book: {
+      id: 19,
+      isbn: "9781118464465",
+      title: "Raspberry Pi User Guide",
+      cover: "http://url.to.book.cover",
+      author: "Eben Upton",
+      published: 2012,
+      pages: 221,
+    },
+    status: 0,
+  },
+  {
+    book: {
+      id: 20,
+      isbn: "9781118464466",
+      title: "Raspberry Pi User Guide",
+      cover: "http://url.to.book.cover",
+      author: "Eben Upton",
+      published: 2012,
+      pages: 221,
+    },
+    status: 1,
+  },
+  {
+    book: {
+      id: 21,
+      isbn: "9781118464467",
+      title: "Raspberry Pi User Guide",
+      cover: "http://url.to.book.cover",
+      author: "Eben Upton",
+      published: 2012,
+      pages: 221,
+    },
+    status: 2,
+  },
+];
+
+// const path = "books";
 
 const BooksList = () => {
   const navigate = useNavigate();
 
-  const { mutate, data, status } = useMutation({
-    mutationFn: async ({
-      method = "get",
-      bookId,
-    }: {
-      method?: "get" | "delete";
-      bookId?: string | undefined;
-    }) => {
-      if (method === "get") {
-        return axios.get("https://0001.uz/books");
-      } else {
-        return axios.delete(`https://0001.uz/books/${bookId}`);
-      }
-    },
-    onError: (error) => {
-      toast.custom((t) => (
-        <Alert
-          t={t}
-          type="error"
-          title={String(get(error, "code"))}
-          description={error?.message}
-        />
-      ));
-    },
-  });
+  const [status, setStatus] = useState<"pending" | "success">("pending");
+
+  // const { data, status } = useCustomQuery({
+  //   url: `${path}`,
+  //   onSuccess: (response) => {
+  //     console.log("Response: ", response);
+  //   },
+  // });
 
   const handleAdd = () => {
     navigate("/add");
   };
 
-  const handleEdit = (bookId: number) => () => {
-    navigate(`/edit/${bookId}`);
-  };
-
-  const handleDelete = (bookId: number) => () => {
-    mutate({
-      method: "delete",
-      bookId: String(bookId),
-    });
-  };
-
   useEffect(() => {
-    mutate({});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => {
+      setStatus("success");
+    }, 3000);
   }, []);
 
   return (
-    <Box mx="100px">
+    <Container>
       <Box display="flex" justifyContent="space-between" mt="36px">
         <Typography fontSize="36px" fontWeight={700} color="#fefefe">
           You’ve got
@@ -93,15 +108,6 @@ const BooksList = () => {
           </Typography>
         </Typography>
         <Stack direction="row" alignItems="center" spacing="24px">
-          <TextField
-            placeholder="Enter your name"
-            sx={{
-              minWidth: "320px",
-              "& .MuiInputBase-root": {
-                background: "#fefefe",
-              },
-            }}
-          />
           <Button
             variant="contained"
             startIcon={<Add />}
@@ -118,75 +124,42 @@ const BooksList = () => {
         </Typography>
       </Box>
       <Box mt="36px">
-        <Grid container spacing={2}>
+        <Grid container spacing="24px">
           {status === "pending"
             ? [...Array.from({ length: 4 })].map((_, index) => (
                 <Grid item xs={12} md={6} lg={4} key={index}>
-                  <StyledCard>
+                  <Card>
                     <Box p="32px">
-                      <Typography variant="h6" fontWeight={600} mb="6px">
-                        <Skeleton width="70%" animation="wave" />
-                      </Typography>
-                      <Typography fontSize="14px" mb="16px">
-                        <Skeleton animation="wave" />
-                        <Skeleton animation="wave" />
-                        <Skeleton width="70%" animation="wave" />
-                      </Typography>
-                      <Box display="flex" justifyContent="space-between">
+                      <Typography variant="h6" fontWeight={600} mb="10px">
                         <Skeleton width="60%" animation="wave" />
-                        <Skeleton width="25%" animation="wave" />
-                      </Box>
-                    </Box>
-                  </StyledCard>
-                </Grid>
-              ))
-            : status === "success"
-            ? get(data, "data", []).map((book: BooksType, index: number) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <StyledCard>
-                    <Box p="32px">
-                      <Typography variant="h6" fontWeight={600} mb="6px">
-                        {book?.title}
                       </Typography>
                       <Typography fontSize="14px" mb="16px">
-                        Lorem ipsum dolor sit amet consectetur. Nulla adipiscing
-                        neque varius vestibulum magna in. Tortor quisque nisl
-                        congue ut tellus sem id.
+                        <Skeleton width="80%" animation="wave" />
+                        <Skeleton animation="wave" />
+                        <Skeleton animation="wave" />
+                        <Skeleton width="70%" animation="wave" />
                       </Typography>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography fontSize="14px" fontWeight={500}>
-                          {book?.author}:&nbsp;
-                          {`${new Date(
-                            book?.published || ""
-                          ).getFullYear()}-year`}
-                        </Typography>
-                        <StyledChip label={`${book.pages} pages`} />
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Skeleton height="20px" width="60%" animation="wave" />
+                        <Skeleton height="40px" width="25%" animation="wave" />
                       </Box>
                     </Box>
-                    <StyledIconButton
-                      color="error"
-                      variant="contained"
-                      onClick={handleDelete(book?.id)}
-                      sx={{ borderBottomLeftRadius: 0 }}
-                    >
-                      <Delete />
-                    </StyledIconButton>
-                    <StyledIconButton
-                      color="primary"
-                      variant="contained"
-                      onClick={handleEdit(book?.id)}
-                      sx={{ top: "50px", borderTopLeftRadius: 0 }}
-                    >
-                      <Edit />
-                    </StyledIconButton>
-                  </StyledCard>
+                  </Card>
                 </Grid>
               ))
-            : ""}
+            : staticBooks.map((book: BooksType, index: number) => (
+                <Grid item xs={12} md={6} lg={4} key={get(book, "book.id")}>
+                  <BookCard {...book} />
+                </Grid>
+              ))}
         </Grid>
       </Box>
       <Outlet />
-    </Box>
+    </Container>
   );
 };
 

@@ -1,7 +1,12 @@
-import { get } from "lodash";
 import axios from "axios";
+import { get } from "lodash";
 
-import { getAuthorizationToken, getLanguage } from "../storage/custom";
+import {
+  clearCookie,
+  getAuthorizationKey,
+  getAuthorizationSign,
+  getLanguage,
+} from "services/storage";
 
 const client = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
@@ -10,17 +15,13 @@ const client = axios.create({
     "Content-Type": "application/json",
     "Accept-Language": getLanguage(),
     "Utc-Offset": new Date().getTimezoneOffset(),
-    Authorization: getAuthorizationToken()
-      ? `Bearer ${getAuthorizationToken()}`
-      : undefined,
+    Key: getAuthorizationKey(),
+    Sign: getAuthorizationSign(),
   },
 });
 
 client.interceptors.request.use(
   (config) => {
-    if (window.location.origin.includes("localhost")) {
-      // config.headers.username = "dev";
-    }
     return config;
   },
   (error) => {
@@ -30,9 +31,13 @@ client.interceptors.request.use(
 
 client.interceptors.response.use(
   (response) => {
-    return get(response, "data");
+    return response;
   },
   (error) => {
+    if (get(error, "response.status") === 403) {
+      clearCookie();
+      window.location.href = "/";
+    }
     return Promise.reject(error?.response?.data);
   }
 );

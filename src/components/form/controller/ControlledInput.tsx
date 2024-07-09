@@ -7,7 +7,7 @@ import {
   RegisterOptions,
   useFormContext,
 } from "react-hook-form";
-import { TextField } from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 import { get } from "lodash";
 
 import { Label } from "../components";
@@ -70,17 +70,28 @@ const ControlledInput: FC<ControlledInputProps> = ({
             {...props}
             {...field}
             InputProps={{
-              startAdornment: startAdornment,
+              startAdornment: startAdornment ? (
+                <InputAdornment position="start">
+                  {startAdornment}
+                </InputAdornment>
+              ) : undefined,
               endAdornment: !!error ? (
-                <CloseCircle color="#FF4D4F" />
+                <InputAdornment position="end">
+                  <CloseCircle color="#FF4D4F" />
+                </InputAdornment>
               ) : isSubmitted ? (
-                <CheckCircle />
-              ) : (
-                endAdornment
-              ),
+                <InputAdornment position="end">
+                  <CheckCircle />
+                </InputAdornment>
+              ) : endAdornment ? (
+                <InputAdornment position="end">{endAdornment}</InputAdornment>
+              ) : undefined,
             }}
             inputRef={ref}
             error={!!error}
+            helperText={
+              !!error ? get(error, "message") || "Invalid value" : undefined
+            }
             value={field?.value || ""}
             onChange={inputChangeHandler(onChange)}
           />

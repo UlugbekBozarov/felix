@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconButton } from "@mui/material";
+import { IconButton, InputAdornment } from "@mui/material";
 import { get } from "lodash";
 
 import { CloseCircle, Search as SearchIcon } from "assets/icons";
@@ -21,14 +21,20 @@ const Search = () => {
       onChange={handleChangeInput}
       value={value}
       InputProps={{
-        startAdornment: <SearchIcon />,
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon />
+          </InputAdornment>
+        ),
         endAdornment: value && (
-          <IconButton onClick={() => setValue("")}>
-            <CloseCircle />
-          </IconButton>
+          <InputAdornment position="end">
+            <IconButton onClick={() => setValue("")}>
+              <CloseCircle />
+            </IconButton>
+          </InputAdornment>
         ),
       }}
-      placeholder="Search for any training you want "
+      placeholder="Search for any training you want"
     />
   );
 };

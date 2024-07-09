@@ -1,24 +1,35 @@
 import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Stack, Button, Typography, Divider, Card } from "@mui/material";
+import { Box, Stack, Button, Typography, Card } from "@mui/material";
 import { get } from "lodash";
 
 import { ControlledInput } from "components/form";
-import { Facebook, Google } from "assets/icons";
-import { client } from "services/api";
+import { setAuthorizationKey, setAuthorizationSign } from "services/storage";
+
+const formNames = {
+  username: "username",
+  password: "password",
+  confirmPassword: "confirmPassword",
+};
 
 const SignUp = () => {
   const formStore = useForm();
 
-  const { handleSubmit } = formStore;
+  const { handleSubmit, setError } = formStore;
 
   const submitHandler = handleSubmit((data) => {
-    client.post("signup", {
-      name: get(data, "name"),
-      email: get(data, "email"),
-      key: get(data, "username"),
-      secret: "2892678138d8d793a28fc49055095d8b",
-    });
+    if (
+      get(data, formNames.password) === get(data, formNames.confirmPassword)
+    ) {
+      setAuthorizationKey("Mason19");
+      setAuthorizationSign("MySecret19");
+      window.location.href = "/";
+    } else {
+      setError(formNames.confirmPassword, {
+        type: "manual",
+        message: "Not the same as a password",
+      });
+    }
   });
 
   return (
@@ -38,49 +49,45 @@ const SignUp = () => {
                   Sign Up
                 </Typography>
                 <Stack spacing={2} my="36px">
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    color="inherit"
-                    startIcon={<Google />}
-                  >
-                    Continue with Google
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    color="inherit"
-                    startIcon={<Facebook />}
-                  >
-                    Continue with Facebook
-                  </Button>
-                  <Divider
-                    sx={{ mt: "26px !important", mb: "10px !important" }}
-                  >
-                    OR
-                  </Divider>
                   <ControlledInput
-                    label="Your name"
-                    name="name"
+                    label="Username"
+                    name={formNames.username}
+                    rules={{ required: true }}
                     placeholder="Enter your username"
                   />
                   <ControlledInput
-                    label="Your email"
-                    name="email"
-                    placeholder="Enter your email"
+                    type="password"
+                    label="Password"
+                    name={formNames.password}
+                    rules={{
+                      required: true,
+                      minLength: {
+                        value: 6,
+                        message: "Must be at least 6 characters long",
+                      },
+                    }}
+                    placeholder="Enter your password"
                   />
                   <ControlledInput
-                    label="Your username"
-                    name="username"
-                    placeholder="Enter your username"
+                    type="password"
+                    label="Confirm password"
+                    name={formNames.confirmPassword}
+                    rules={{
+                      required: true,
+                      minLength: {
+                        value: 6,
+                        message: "Must be at least 6 characters long",
+                      },
+                    }}
+                    placeholder="Enter your confirm password"
                   />
                 </Stack>
                 <Box>
                   <Button fullWidth variant="contained" type="submit">
-                    Button
+                    Submit
                   </Button>
                   <Typography textAlign="center" mt="12px">
-                    Already signed up?
+                    Already signed up?&nbsp;
                     <Link to="/" style={{ textDecoration: "initial" }}>
                       <Typography component="span" color="primary">
                         Go to sign in.

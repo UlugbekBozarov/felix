@@ -3,7 +3,7 @@ import { TextField, styled } from "@mui/material";
 export const StyledSearchInput = styled(TextField, {
   shouldForwardProp: (prop) => prop !== "isValue",
 })<{ isValue?: boolean }>(({ isValue }) => ({
-  minWidth: "380px",
+  minWidth: "300px",
   transition: "all 0.3s",
   background: isValue ? "#fefefe" : "transparent",
   borderRadius: "6px",

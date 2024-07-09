@@ -1,17 +1,20 @@
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import { Box } from "@mui/material";
 
 import { Spinner } from "components/common";
 import Navbar from "./navbar/Navbar";
 
 const Layout = () => {
   return (
-    <div>
+    <Fragment>
       <Navbar />
-      <Suspense fallback={<Spinner />}>
-        <Outlet />
-      </Suspense>
-    </div>
+      <Box pt="72px">
+        <Suspense fallback={<Spinner />}>
+          <Outlet />
+        </Suspense>
+      </Box>
+    </Fragment>
   );
 };
 
