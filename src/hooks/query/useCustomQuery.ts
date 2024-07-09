@@ -56,17 +56,6 @@ const useCustomQuery = ({
       }).then((response) => {
         return response.json();
       });
-      // const response = await client({
-      //   url,
-      //   data,
-      //   method,
-      //   params,
-      //   cancelToken,
-      //   headers,
-      // })
-      // .catch((error) => {
-      //   throw new Error("Fetch not successful", error);
-      // });
       return response;
     },
   });
