@@ -5,7 +5,7 @@ import { ErrorBoundary } from "services/error";
 
 import Layout from "layout/Layout";
 import NotFound from "pages/404/NotFound";
-// Books
+
 import { BooksAddOrEditModal, BooksList } from "pages/books";
 
 const router = createBrowserRouter([

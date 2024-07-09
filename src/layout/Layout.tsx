@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
 
 import { Spinner } from "components/common";
+
 import Navbar from "./navbar/Navbar";
 
 const Layout = () => {

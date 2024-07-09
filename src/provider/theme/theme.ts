@@ -104,8 +104,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           "@media(min-width: 1200px)": {
-            paddingLeft: "40px", // lg o'lchamda paddingni sozlash
-            paddingRight: "40px", // lg o'lchamda paddingni sozlash
+            paddingLeft: "40px",
+            paddingRight: "40px",
           },
         },
       },

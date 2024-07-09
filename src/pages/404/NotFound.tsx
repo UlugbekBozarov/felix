@@ -1,6 +1,7 @@
-import { Box, Button, Stack } from "@mui/material";
-import { NotFound as NotFoundIcon } from "assets/icons";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, Stack } from "@mui/material";
+
+import { NotFound as NotFoundIcon } from "assets/icons";
 
 const NotFound = () => {
   const navigate = useNavigate();
